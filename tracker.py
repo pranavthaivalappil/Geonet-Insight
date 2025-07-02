@@ -52,7 +52,87 @@ def main():
     with tab2:
         st.header("IP Address Tracker & Geolocation")
         st.info("Track IP addresses to get location, ISP, and security information.")
-        st.write("IP tracking functionality coming soon...")
+        
+        # Option to detect user's own IP or enter custom IP
+        ip_option = st.radio(
+            "Choose IP tracking option:",
+            ["Track My IP", "Enter Custom IP"]
+        )
+        
+        if ip_option == "Track My IP":
+            if st.button("Track My IP Address"):
+                with st.spinner("Fetching your IP information..."):
+                    ip_data = track_ip("")  # Empty string gets user's own IP
+                    if ip_data:
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            st.subheader("📍 Location Information")
+                            st.write(f"**IP Address:** {ip_data.get('ip', 'N/A')}")
+                            st.write(f"**Country:** {ip_data.get('country_name', 'N/A')}")
+                            st.write(f"**Region:** {ip_data.get('region', 'N/A')}")
+                            st.write(f"**City:** {ip_data.get('city', 'N/A')}")
+                            st.write(f"**Postal Code:** {ip_data.get('postal', 'N/A')}")
+                            st.write(f"**Timezone:** {ip_data.get('timezone', 'N/A')}")
+                        
+                        with col2:
+                            st.subheader("🌐 Network Information")
+                            st.write(f"**ISP:** {ip_data.get('org', 'N/A')}")
+                            st.write(f"**ASN:** {ip_data.get('asn', 'N/A')}")
+                            st.write(f"**Coordinates:** {ip_data.get('latitude', 'N/A')}, {ip_data.get('longitude', 'N/A')}")
+                            
+                            # Security indicators
+                            if ip_data.get('in_eu'):
+                                st.write("🇪🇺 **Located in EU**")
+                            
+                        # Additional information
+                        st.subheader("📊 Additional Details")
+                        st.json(ip_data)
+                    else:
+                        st.error("Failed to fetch IP information. Please try again.")
+        
+        else:  # Enter Custom IP
+            custom_ip = st.text_input("Enter IP Address to Track:", placeholder="e.g., 8.8.8.8")
+            
+            if st.button("Track IP Address"):
+                if custom_ip:
+                    # Basic IP validation
+                    import re
+                    ip_pattern = r'^(\d{1,3}\.){3}\d{1,3}$'
+                    if re.match(ip_pattern, custom_ip):
+                        with st.spinner(f"Tracking IP: {custom_ip}..."):
+                            ip_data = track_ip(custom_ip)
+                            if ip_data:
+                                col1, col2 = st.columns(2)
+                                
+                                with col1:
+                                    st.subheader("📍 Location Information")
+                                    st.write(f"**IP Address:** {ip_data.get('ip', 'N/A')}")
+                                    st.write(f"**Country:** {ip_data.get('country_name', 'N/A')}")
+                                    st.write(f"**Region:** {ip_data.get('region', 'N/A')}")
+                                    st.write(f"**City:** {ip_data.get('city', 'N/A')}")
+                                    st.write(f"**Postal Code:** {ip_data.get('postal', 'N/A')}")
+                                    st.write(f"**Timezone:** {ip_data.get('timezone', 'N/A')}")
+                                
+                                with col2:
+                                    st.subheader("🌐 Network Information")
+                                    st.write(f"**ISP:** {ip_data.get('org', 'N/A')}")
+                                    st.write(f"**ASN:** {ip_data.get('asn', 'N/A')}")
+                                    st.write(f"**Coordinates:** {ip_data.get('latitude', 'N/A')}, {ip_data.get('longitude', 'N/A')}")
+                                    
+                                    # Security indicators
+                                    if ip_data.get('in_eu'):
+                                        st.write("🇪🇺 **Located in EU**")
+                                
+                                # Additional information
+                                st.subheader("📊 Raw API Response")
+                                st.json(ip_data)
+                            else:
+                                st.error("Failed to fetch IP information. Please check the IP address and try again.")
+                    else:
+                        st.error("Please enter a valid IP address format (e.g., 192.168.1.1)")
+                else:
+                    st.warning("Please enter an IP address to track.")
 
 
 if __name__ == "__main__":
