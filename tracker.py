@@ -21,8 +21,8 @@ def track_ip(ip_address):
 
 
 def main():
-    st.title("Phone Number Location Tracker & Service Operator Identifier")
-    st.subheader("Build usihg Python and Streamlit")
+    st.title("Network Tracker: Phone Number & IP Address Intelligence")
+    st.subheader("Built using Python and Streamlit")
     st.info("Note: The detected service operator is based on the original number assignment and may not reflect the current operator if the number has been ported.")
     mobile_number = st.text_input("Enter Your Phone Number: ", type="password")
     manual_operator = st.text_input("(Optional) Enter your current operator if ported (e.g., Jio, Airtel, Vi):")
