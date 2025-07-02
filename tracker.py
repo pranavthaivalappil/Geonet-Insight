@@ -5,6 +5,21 @@ import requests
 import json
 
 
+def track_ip(ip_address):
+    """Track IP address and return geolocation and ISP information"""
+    try:
+        # Using ipapi.co for IP tracking (free tier: 1000 requests/day)
+        response = requests.get(f"https://ipapi.co/{ip_address}/json/")
+        if response.status_code == 200:
+            data = response.json()
+            return data
+        else:
+            return None
+    except Exception as e:
+        st.error(f"Error fetching IP data: {str(e)}")
+        return None
+
+
 def main():
     st.title("Phone Number Location Tracker & Service Operator Identifier")
     st.subheader("Build usihg Python and Streamlit")
