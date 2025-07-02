@@ -1,6 +1,8 @@
 import phonenumbers
 import streamlit as st
 from phonenumbers import carrier, geocoder
+import requests
+import json
 
 
 def main():
@@ -21,7 +23,6 @@ def main():
             st.info(f"(Detected Operator: {detected_operator})")
         else:
             st.success(f"Service Operator: {detected_operator}")
-        
 
 
 if __name__ == "__main__":
