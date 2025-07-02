@@ -124,6 +124,15 @@ def main():
                                     if ip_data.get('in_eu'):
                                         st.write("🇪🇺 **Located in EU**")
                                 
+                                # Map visualization (if coordinates available)
+                                if ip_data.get('latitude') and ip_data.get('longitude'):
+                                    st.subheader("🗺️ Location on Map")
+                                    map_data = {
+                                        'lat': [float(ip_data.get('latitude'))],
+                                        'lon': [float(ip_data.get('longitude'))]
+                                    }
+                                    st.map(map_data)
+                                
                                 # Additional information
                                 st.subheader("📊 Raw API Response")
                                 st.json(ip_data)
@@ -133,6 +142,10 @@ def main():
                         st.error("Please enter a valid IP address format (e.g., 192.168.1.1)")
                 else:
                     st.warning("Please enter an IP address to track.")
+    
+    # Footer
+    st.markdown("---")
+    st.markdown("**Note:** IP tracking uses ipapi.co free tier (1000 requests/day). For production use, consider upgrading to a paid plan.")
 
 
 if __name__ == "__main__":
