@@ -5,19 +5,20 @@ import requests
 import json
 
 def track_ip(ip_address):
-    """Track IP address and return geolocation and ISP information using ip-api.com"""
+    """Track IP address and return geolocation and ISP information using ipinfo.io"""
     try:
-        # Use ip-api.com (no API key required, generous free tier)
-        url = f"http://ip-api.com/json/{ip_address or ''}"
+        # Use ipinfo.io (no API key required, generous free tier: 50,000 requests/month)
+        url = f"https://ipinfo.io/{ip_address or ''}/json"
         response = requests.get(url)
         st.write("API status code:", response.status_code)
         st.write("API raw response:", response.text)
         if response.status_code == 200:
             data = response.json()
-            if data.get("status") == "success":
+            # ipinfo.io doesn't have a status field like ip-api, so we check if we got useful data
+            if data.get('ip'):
                 return data
             else:
-                st.error(f"API error: {data.get('message', 'Unknown error')}")
+                st.error("API returned empty or invalid data")
                 return None
         else:
             st.error(f"HTTP error: {response.status_code}")
@@ -75,18 +76,18 @@ def main():
                         
                         with col1:
                             st.subheader("📍 Location Information")
-                            st.write(f"**IP Address:** {ip_data.get('query', 'N/A')}")
+                            st.write(f"**IP Address:** {ip_data.get('ip', 'N/A')}")
                             st.write(f"**Country:** {ip_data.get('country', 'N/A')}")
-                            st.write(f"**Region:** {ip_data.get('regionName', 'N/A')}")
+                            st.write(f"**Region:** {ip_data.get('region', 'N/A')}")
                             st.write(f"**City:** {ip_data.get('city', 'N/A')}")
-                            st.write(f"**Postal Code:** {ip_data.get('zip', 'N/A')}")
+                            st.write(f"**Postal Code:** {ip_data.get('postal', 'N/A')}")
                             st.write(f"**Timezone:** {ip_data.get('timezone', 'N/A')}")
                         
                         with col2:
                             st.subheader("🌐 Network Information")
-                            st.write(f"**ISP:** {ip_data.get('isp', 'N/A')}")
-                            st.write(f"**ASN:** {ip_data.get('as', 'N/A')}")
-                            st.write(f"**Coordinates:** {ip_data.get('lat', 'N/A')}, {ip_data.get('lon', 'N/A')}")
+                            st.write(f"**ISP:** {ip_data.get('org', 'N/A')}")
+                            st.write(f"**ASN:** {ip_data.get('asn', 'N/A')}")
+                            st.write(f"**Coordinates:** {ip_data.get('loc', 'N/A')}")
                             
                             # Security indicators (not available in ip-api, so skip)
                             # if ip_data.get('in_eu'):
@@ -114,28 +115,28 @@ def main():
                                 
                                 with col1:
                                     st.subheader("📍 Location Information")
-                                    st.write(f"**IP Address:** {ip_data.get('query', 'N/A')}")
+                                    st.write(f"**IP Address:** {ip_data.get('ip', 'N/A')}")
                                     st.write(f"**Country:** {ip_data.get('country', 'N/A')}")
-                                    st.write(f"**Region:** {ip_data.get('regionName', 'N/A')}")
+                                    st.write(f"**Region:** {ip_data.get('region', 'N/A')}")
                                     st.write(f"**City:** {ip_data.get('city', 'N/A')}")
-                                    st.write(f"**Postal Code:** {ip_data.get('zip', 'N/A')}")
+                                    st.write(f"**Postal Code:** {ip_data.get('postal', 'N/A')}")
                                     st.write(f"**Timezone:** {ip_data.get('timezone', 'N/A')}")
                                 
                                 with col2:
                                     st.subheader("🌐 Network Information")
-                                    st.write(f"**ISP:** {ip_data.get('isp', 'N/A')}")
-                                    st.write(f"**ASN:** {ip_data.get('as', 'N/A')}")
-                                    st.write(f"**Coordinates:** {ip_data.get('lat', 'N/A')}, {ip_data.get('lon', 'N/A')}")
+                                    st.write(f"**ISP:** {ip_data.get('org', 'N/A')}")
+                                    st.write(f"**ASN:** {ip_data.get('asn', 'N/A')}")
+                                    st.write(f"**Coordinates:** {ip_data.get('loc', 'N/A')}")
                                     # Security indicators (not available in ip-api, so skip)
                                     # if ip_data.get('in_eu'):
                                     #     st.write("🇪🇺 **Located in EU**")
                                 
                                 # Map visualization (if coordinates available)
-                                if ip_data.get('lat') and ip_data.get('lon'):
+                                if ip_data.get('loc'):
                                     st.subheader("🗺️ Location on Map")
                                     map_data = {
-                                        'lat': [float(ip_data.get('lat'))],
-                                        'lon': [float(ip_data.get('lon'))]
+                                        'lat': [float(ip_data.get('loc').split(',')[0])],
+                                        'lon': [float(ip_data.get('loc').split(',')[1])]
                                     }
                                     st.map(map_data)
                                 
@@ -151,7 +152,7 @@ def main():
     
     # Footer
     st.markdown("---")
-    st.markdown("**Note:** IP tracking uses ip-api.com free tier (45 requests/minute, generous for most use cases). For production use, consider their paid plan.")
+    st.markdown("**Note:** IP tracking uses ipinfo.io free tier (50,000 requests/month, generous for most use cases). For production use, consider their paid plan.")
 
 
 if __name__ == "__main__":
