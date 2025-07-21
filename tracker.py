@@ -4,16 +4,23 @@ from phonenumbers import carrier, geocoder
 import requests
 import json
 
-
 def track_ip(ip_address):
-    """Track IP address and return geolocation and ISP information"""
+    """Track IP address and return geolocation and ISP information using ip-api.com"""
     try:
-        # Using ipapi.co for IP tracking (free tier: 1000 requests/day)
-        response = requests.get(f"https://ipapi.co/{ip_address}/json/")
+        # Use ip-api.com (no API key required, generous free tier)
+        url = f"http://ip-api.com/json/{ip_address or ''}"
+        response = requests.get(url)
+        st.write("API status code:", response.status_code)
+        st.write("API raw response:", response.text)
         if response.status_code == 200:
             data = response.json()
-            return data
+            if data.get("status") == "success":
+                return data
+            else:
+                st.error(f"API error: {data.get('message', 'Unknown error')}")
+                return None
         else:
+            st.error(f"HTTP error: {response.status_code}")
             return None
     except Exception as e:
         st.error(f"Error fetching IP data: {str(e)}")
@@ -68,23 +75,23 @@ def main():
                         
                         with col1:
                             st.subheader("📍 Location Information")
-                            st.write(f"**IP Address:** {ip_data.get('ip', 'N/A')}")
-                            st.write(f"**Country:** {ip_data.get('country_name', 'N/A')}")
-                            st.write(f"**Region:** {ip_data.get('region', 'N/A')}")
+                            st.write(f"**IP Address:** {ip_data.get('query', 'N/A')}")
+                            st.write(f"**Country:** {ip_data.get('country', 'N/A')}")
+                            st.write(f"**Region:** {ip_data.get('regionName', 'N/A')}")
                             st.write(f"**City:** {ip_data.get('city', 'N/A')}")
-                            st.write(f"**Postal Code:** {ip_data.get('postal', 'N/A')}")
+                            st.write(f"**Postal Code:** {ip_data.get('zip', 'N/A')}")
                             st.write(f"**Timezone:** {ip_data.get('timezone', 'N/A')}")
                         
                         with col2:
                             st.subheader("🌐 Network Information")
-                            st.write(f"**ISP:** {ip_data.get('org', 'N/A')}")
-                            st.write(f"**ASN:** {ip_data.get('asn', 'N/A')}")
-                            st.write(f"**Coordinates:** {ip_data.get('latitude', 'N/A')}, {ip_data.get('longitude', 'N/A')}")
+                            st.write(f"**ISP:** {ip_data.get('isp', 'N/A')}")
+                            st.write(f"**ASN:** {ip_data.get('as', 'N/A')}")
+                            st.write(f"**Coordinates:** {ip_data.get('lat', 'N/A')}, {ip_data.get('lon', 'N/A')}")
                             
-                            # Security indicators
-                            if ip_data.get('in_eu'):
-                                st.write("🇪🇺 **Located in EU**")
-                            
+                            # Security indicators (not available in ip-api, so skip)
+                            # if ip_data.get('in_eu'):
+                            #     st.write("🇪🇺 **Located in EU**")
+                        
                         # Additional information
                         st.subheader("📊 Additional Details")
                         st.json(ip_data)
@@ -107,29 +114,28 @@ def main():
                                 
                                 with col1:
                                     st.subheader("📍 Location Information")
-                                    st.write(f"**IP Address:** {ip_data.get('ip', 'N/A')}")
-                                    st.write(f"**Country:** {ip_data.get('country_name', 'N/A')}")
-                                    st.write(f"**Region:** {ip_data.get('region', 'N/A')}")
+                                    st.write(f"**IP Address:** {ip_data.get('query', 'N/A')}")
+                                    st.write(f"**Country:** {ip_data.get('country', 'N/A')}")
+                                    st.write(f"**Region:** {ip_data.get('regionName', 'N/A')}")
                                     st.write(f"**City:** {ip_data.get('city', 'N/A')}")
-                                    st.write(f"**Postal Code:** {ip_data.get('postal', 'N/A')}")
+                                    st.write(f"**Postal Code:** {ip_data.get('zip', 'N/A')}")
                                     st.write(f"**Timezone:** {ip_data.get('timezone', 'N/A')}")
                                 
                                 with col2:
                                     st.subheader("🌐 Network Information")
-                                    st.write(f"**ISP:** {ip_data.get('org', 'N/A')}")
-                                    st.write(f"**ASN:** {ip_data.get('asn', 'N/A')}")
-                                    st.write(f"**Coordinates:** {ip_data.get('latitude', 'N/A')}, {ip_data.get('longitude', 'N/A')}")
-                                    
-                                    # Security indicators
-                                    if ip_data.get('in_eu'):
-                                        st.write("🇪🇺 **Located in EU**")
+                                    st.write(f"**ISP:** {ip_data.get('isp', 'N/A')}")
+                                    st.write(f"**ASN:** {ip_data.get('as', 'N/A')}")
+                                    st.write(f"**Coordinates:** {ip_data.get('lat', 'N/A')}, {ip_data.get('lon', 'N/A')}")
+                                    # Security indicators (not available in ip-api, so skip)
+                                    # if ip_data.get('in_eu'):
+                                    #     st.write("🇪🇺 **Located in EU**")
                                 
                                 # Map visualization (if coordinates available)
-                                if ip_data.get('latitude') and ip_data.get('longitude'):
+                                if ip_data.get('lat') and ip_data.get('lon'):
                                     st.subheader("🗺️ Location on Map")
                                     map_data = {
-                                        'lat': [float(ip_data.get('latitude'))],
-                                        'lon': [float(ip_data.get('longitude'))]
+                                        'lat': [float(ip_data.get('lat'))],
+                                        'lon': [float(ip_data.get('lon'))]
                                     }
                                     st.map(map_data)
                                 
@@ -145,7 +151,7 @@ def main():
     
     # Footer
     st.markdown("---")
-    st.markdown("**Note:** IP tracking uses ipapi.co free tier (1000 requests/day). For production use, consider upgrading to a paid plan.")
+    st.markdown("**Note:** IP tracking uses ip-api.com free tier (45 requests/minute, generous for most use cases). For production use, consider their paid plan.")
 
 
 if __name__ == "__main__":
