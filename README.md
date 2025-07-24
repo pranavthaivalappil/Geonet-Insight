@@ -1,3 +1,5 @@
+Note: This is hosted on Streamlit community cloud so the application will go to sleep if it's idle for long time so if it's idle wake it up and wait for few seconds sorry for the inconvenience
+
 # Telecom & IP Address Tracker
 
 A web app to track phone number details (location, operator) and IP address geolocation/network info, built with Python and Streamlit.
