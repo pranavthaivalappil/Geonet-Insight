@@ -199,11 +199,11 @@ def main():
     st.info("🔒 **Privacy Notice:** This app automatically detects your IP address to provide accurate geolocation services. Search history is stored locally for analytics. No personal information is shared with third parties.")
     
     # Create tabs for different tracking types
-    tab2, tab1, tab3 = st.tabs(["🌐 IP Address Tracker", "📱 Phone Number Tracker", "📊 Analytics & History"])
+    tab2, tab1, tab3 = st.tabs(["🌐 IP Address Intelligence", "📱 Phone Number Intelligence", "📊 Analytics & History"])
     
     with tab2:
-        st.header("IP Address Tracker & Geolocation")
-        st.info("Track IP addresses to get location, ISP, and security information.")
+        st.header("IP Address Intelligence & Geolocation")
+        st.info("Analyze IP addresses to get location, ISP, and network intelligence.")
         
         # Initialize session state for client IP
         if 'client_ip' not in st.session_state:
@@ -372,7 +372,7 @@ def main():
                     st.warning("Please enter an IP address to track.")
     
     with tab1:
-        st.header("Phone Number Location Tracker & Service Operator Identifier")
+        st.header("Phone Number Intelligence & Service Operator Identifier")
         st.info("Note: The detected service operator is based on the original number assignment and may not reflect the current operator if the number has been ported.")
         mobile_number = st.text_input("Enter Your Phone Number: ", type="password")
         manual_operator = st.text_input("(Optional) Enter your current operator if ported (e.g., Jio, Airtel, Vi):")
