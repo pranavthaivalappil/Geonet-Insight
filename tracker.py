@@ -199,47 +199,7 @@ def main():
     st.info("🔒 **Privacy Notice:** This app automatically detects your IP address to provide accurate geolocation services. Search history is stored locally for analytics. No personal information is shared with third parties.")
     
     # Create tabs for different tracking types
-    tab1, tab2, tab3 = st.tabs(["📱 Phone Number Tracker", "🌐 IP Address Tracker", "📊 Analytics & History"])
-    
-    with tab1:
-        st.header("Phone Number Location Tracker & Service Operator Identifier")
-        st.info("Note: The detected service operator is based on the original number assignment and may not reflect the current operator if the number has been ported.")
-        mobile_number = st.text_input("Enter Your Phone Number: ", type="password")
-        manual_operator = st.text_input("(Optional) Enter your current operator if ported (e.g., Jio, Airtel, Vi):")
-        
-        if st.button("Track Phone Number"):
-            if mobile_number:
-                ch_number = phonenumbers.parse(mobile_number, "CH")
-                country = geocoder.description_for_number(ch_number, "en")
-                st.success(f"Country Name: {country}")
-                
-                services_operator = phonenumbers.parse(mobile_number, "RO")
-                detected_operator = carrier.name_for_number(services_operator, "en")
-                
-                if manual_operator.strip():
-                    st.success(f"Service Operator (Manual): {manual_operator.strip()}")
-                    st.info(f"(Detected Operator: {detected_operator})")
-                else:
-                    st.success(f"Service Operator: {detected_operator}")
-                
-                # Get user's IP for logging
-                try:
-                    user_ip_response = requests.get("https://api.ipify.org?format=json")
-                    user_ip = user_ip_response.json().get('ip', 'Unknown') if user_ip_response.status_code == 200 else 'Unknown'
-                except:
-                    user_ip = 'Unknown'
-                
-                # Save to database
-                save_phone_search(
-                    mobile_number[:5] + "***",  # Partially mask phone number for privacy
-                    country,
-                    detected_operator,
-                    manual_operator.strip() if manual_operator.strip() else None,
-                    user_ip
-                )
-                st.success("✅ Search saved to history!")
-            else:
-                st.warning("Please enter a phone number to track.")
+    tab2, tab1, tab3 = st.tabs(["🌐 IP Address Tracker", "📱 Phone Number Tracker", "📊 Analytics & History"])
     
     with tab2:
         st.header("IP Address Tracker & Geolocation")
@@ -410,6 +370,46 @@ def main():
                         st.error("Please enter a valid IP address format (e.g., 192.168.1.1)")
                 else:
                     st.warning("Please enter an IP address to track.")
+    
+    with tab1:
+        st.header("Phone Number Location Tracker & Service Operator Identifier")
+        st.info("Note: The detected service operator is based on the original number assignment and may not reflect the current operator if the number has been ported.")
+        mobile_number = st.text_input("Enter Your Phone Number: ", type="password")
+        manual_operator = st.text_input("(Optional) Enter your current operator if ported (e.g., Jio, Airtel, Vi):")
+        
+        if st.button("Track Phone Number"):
+            if mobile_number:
+                ch_number = phonenumbers.parse(mobile_number, "CH")
+                country = geocoder.description_for_number(ch_number, "en")
+                st.success(f"Country Name: {country}")
+                
+                services_operator = phonenumbers.parse(mobile_number, "RO")
+                detected_operator = carrier.name_for_number(services_operator, "en")
+                
+                if manual_operator.strip():
+                    st.success(f"Service Operator (Manual): {manual_operator.strip()}")
+                    st.info(f"(Detected Operator: {detected_operator})")
+                else:
+                    st.success(f"Service Operator: {detected_operator}")
+                
+                # Get user's IP for logging
+                try:
+                    user_ip_response = requests.get("https://api.ipify.org?format=json")
+                    user_ip = user_ip_response.json().get('ip', 'Unknown') if user_ip_response.status_code == 200 else 'Unknown'
+                except:
+                    user_ip = 'Unknown'
+                
+                # Save to database
+                save_phone_search(
+                    mobile_number[:5] + "***",  # Partially mask phone number for privacy
+                    country,
+                    detected_operator,
+                    manual_operator.strip() if manual_operator.strip() else None,
+                    user_ip
+                )
+                st.success("✅ Search saved to history!")
+            else:
+                st.warning("Please enter a phone number to track.")
     
     with tab3:
         st.header("📊 Analytics & Search History")
